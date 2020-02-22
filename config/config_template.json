@@ -6,8 +6,16 @@
         "database": "Database",
         "port": 1433
     },
-    "stored_procedures": {
-        "log_nodejs_app": "SP_LogNodeJSApp"
+    "sp": {
+        "log_nodejs_app": {
+            "name": "SP_LogNodeJSApp",
+            "params": {
+                "primary_app_name": "primaryAppName",
+                "message": "message",
+                "secondary_app_name": "secondaryAppName",
+                "log_type_ID": "logTypeID"
+            }
+        }
     },
     "log_types": {
         "debug": 0,
