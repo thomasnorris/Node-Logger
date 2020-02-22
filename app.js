@@ -74,8 +74,6 @@ async function connectDB() {
     });
 }
 
-// if appName === undefined, the record will insert the name from settings
-// if secondaryAppName === undefined, the record will insert NULL
 async function executeLogging(message, appName, logTypeID) {
     return new Promise((resolve, reject) => {
         (async () => {
