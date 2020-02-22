@@ -110,5 +110,7 @@ async function executeLogging(message, appName, logTypeID) {
 }
 
 function readJson(filePath) {
-    return JSON.parse(require('fs').readFileSync(filePath, 'utf8'));
+    var fs = require('fs');
+    var path = require('path');
+    return JSON.parse(fs.readFileSync(path.resolve(__dirname, filePath), 'utf8'));
 }
