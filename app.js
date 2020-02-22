@@ -8,27 +8,6 @@ var _cfg = readJson(CFG_FILE);
 var _pool = new _sql.ConnectionPool(_cfg.connection);
 
 var _exports = module.exports = {
-    Config: _cfg,
-    Connect: async function() {
-        return new Promise((resolve, reject) => {
-            _pool.connect()
-                .then(() => {
-                    resolve('Connected.');
-                }).catch((err) => {
-                    reject(err);
-                });
-        });
-    },
-    Disconnect: async function() {
-        return new Promise((resolve, reject) => {
-            _pool.close()
-                .then(() => {
-                    resolve('Disconnected.');
-                }).catch((err) => {
-                    reject(err);
-                });
-        });
-    },
     LogDebug: async function(primaryAppName, message, secondaryAppName) {
         return new Promise((resolve, reject) => {
             executeLogging(primaryAppName, message, _cfg.log_types.debug, secondaryAppName)
@@ -75,6 +54,29 @@ var _exports = module.exports = {
     }
 }
 
+async function disconnectDB() {
+    return new Promise((resolve, reject) => {
+        _pool.close()
+            .then(() => {
+                resolve('Disconnected.');
+            }).catch((err) => {
+                reject(err);
+            });
+    });
+}
+
+async function connectDB() {
+    return new Promise((resolve, reject) => {
+        _pool.connect()
+            .then(() => {
+                resolve('Connected.');
+            }).catch((err) => {
+                reject(err);
+            });
+    });
+}
+
+// if secondaryAppName === undefined, the record will insert NULL
 async function executeLogging(primaryAppName, message, logTypeID, secondaryAppName) {
     return new Promise((resolve, reject) => {
         (async () => {
@@ -87,11 +89,11 @@ async function executeLogging(primaryAppName, message, logTypeID, secondaryAppNa
                 .input(params.log_type_ID, _sql.Int, logTypeID)
                 .input(params.secondary_app_name, _sql.VarChar(_sql.MAX), secondaryAppName);
 
-            _exports.Connect()
+            connectDB()
                 .then(() => {
                     request.execute(sp.name)
                         .then(() => {
-                            _exports.Disconnect()
+                            disconnectDB()
                                 .then(() => {
                                     resolve('Execution successful.');
                                 })
