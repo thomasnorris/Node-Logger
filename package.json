@@ -4,7 +4,6 @@
   "description": "Submodule for logging events to SQL Server Database",
   "main": "app.js",
   "dependencies": {
-    "git-repo-name": "^1.0.1",
     "mssql": "^6.1.0"
   },
   "devDependencies": {},

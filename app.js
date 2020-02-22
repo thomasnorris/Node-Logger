@@ -1,17 +1,14 @@
 
-// Directory of the config file is from the root folder of whatever host app is running
-const CFG_FILE = './Node-Logger/config/config.json';
-
+const CFG_FILE = './config/config.json';
 var _cfg = readJson(CFG_FILE);
-var _repoName = require('git-repo-name').sync();
 
 var _sql = require('mssql');
-var _pool = new _sql.ConnectionPool(_cfg.connection);
+var _pool = new _sql.ConnectionPool(_cfg.sql.connection);
 
 module.exports = {
-    LogDebug: async function(message, primaryAppName = null, secondaryAppName = null) {
+    LogDebug: async function(message, appName = null) {
         return new Promise((resolve, reject) => {
-            executeLogging(message, primaryAppName, secondaryAppName, _cfg.log_types.debug)
+            executeLogging(message, appName, _cfg.sql.log_types.debug)
                 .then((msg) => {
                     resolve(msg);
                 })
@@ -20,9 +17,9 @@ module.exports = {
                 });
         });
     },
-    LogInfo: async function(message, primaryAppName = null, secondaryAppName = null) {
+    LogInfo: async function(message, appName = null) {
         return new Promise((resolve, reject) => {
-            executeLogging(message, primaryAppName, secondaryAppName, _cfg.log_types.info)
+            executeLogging(message, appName, _cfg.sql.log_types.info)
                 .then((msg) => {
                     resolve(msg);
                 })
@@ -31,9 +28,9 @@ module.exports = {
                 });
         });
     },
-    LogWarning: async function(message, primaryAppName = null, secondaryAppName = null) {
+    LogWarning: async function(message, appName = null) {
         return new Promise((resolve, reject) => {
-            executeLogging(message, primaryAppName, secondaryAppName, _cfg.log_types.warning)
+            executeLogging(message, appName, _cfg.sql.log_types.warning)
                 .then((msg) => {
                     resolve(msg);
                 })
@@ -42,9 +39,9 @@ module.exports = {
                 });
         });
     },
-    LogError: async function(message, primaryAppName = null, secondaryAppName = null) {
+    LogError: async function(message, appName = null) {
         return new Promise((resolve, reject) => {
-            executeLogging(message, primaryAppName, secondaryAppName, _cfg.log_types.error)
+            executeLogging(message, appName, _cfg.sql.log_types.error)
                 .then((msg) => {
                     resolve(msg);
                 })
@@ -77,20 +74,19 @@ async function connectDB() {
     });
 }
 
-// if primaryAppName === undefined, the record will insert _repoName
+// if appName === undefined, the record will insert the name from settings
 // if secondaryAppName === undefined, the record will insert NULL
-async function executeLogging(message, primaryAppName, secondaryAppName, logTypeID) {
+async function executeLogging(message, appName, logTypeID) {
     return new Promise((resolve, reject) => {
         (async () => {
-            var sp = _cfg.sp.log_nodejs_app;
+            var sp = _cfg.sql.sp.log_nodejs_app;
             var params = sp.params;
 
             // build a request that will execute sp with params
             var request = _pool.request();
-            request.input(params.primary_app_name, _sql.VarChar(_sql.MAX), primaryAppName || _repoName)
+            request.input(params.primary_app_name, _sql.VarChar(_sql.MAX), appName || _cfg.default_app_name)
                 .input(params.message, _sql.VarChar(_sql.MAX), message)
                 .input(params.log_type_ID, _sql.Int, logTypeID)
-                .input(params.secondary_app_name, _sql.VarChar(_sql.MAX), secondaryAppName);
 
             connectDB()
                 .then(() => {
