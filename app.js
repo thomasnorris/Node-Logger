@@ -6,6 +6,17 @@ var _sql = require('mssql');
 var _pool = new _sql.ConnectionPool(_cfg.sql.connection);
 
 module.exports = {
+    Init: async function(message = null, appName = null) {
+        return new Promise((resolve, reject) => {
+            this.LogInfo(message || _cfg.default_init_message, appName)
+                .then((msg) => {
+                    resolve(msg);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        });
+    },
     LogDebug: async function(message, appName = null) {
         return new Promise((resolve, reject) => {
             executeLogging(message, appName, _cfg.sql.log_types.debug)

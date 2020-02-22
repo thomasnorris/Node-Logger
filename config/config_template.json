@@ -28,5 +28,6 @@
             "error": 3
         }
     },
-    "default_app_name": "LocalRepoName"
+    "default_app_name": "LocalRepoName",
+    "default_init_message": "App started."
 }
