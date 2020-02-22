@@ -1,8 +1,9 @@
 
-const CFG_FILE = './config/config.json';
+// Directory of the config file is from the root folder of whatever host app is running
+const CFG_FILE = './Node-Logger/config/config.json';
+
 var _cfg = readJson(CFG_FILE);
 var _repoName = require('git-repo-name').sync();
-
 
 var _sql = require('mssql');
 var _pool = new _sql.ConnectionPool(_cfg.connection);

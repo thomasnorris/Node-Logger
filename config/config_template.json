@@ -4,7 +4,10 @@
         "password": "password",
         "server": "localhost\\sqlexpress",
         "database": "Database",
-        "port": 1433
+        "port": 1433,
+        "options": {
+            "enableArithAbort": true
+        }
     },
     "sp": {
         "log_nodejs_app": {
