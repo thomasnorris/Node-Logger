@@ -1,5 +1,6 @@
 
-const CFG_FILE = './config/config.json';
+var _path = require('path');
+const CFG_FILE = _path.resolve(__dirname, 'config', 'config.json');
 var _cfg = readJson(CFG_FILE);
 
 var _sql = require('mssql');
