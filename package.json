@@ -1,0 +1,20 @@
+{
+  "name": "Node-Logger",
+  "version": "1.0.0",
+  "description": "Submodule for logging events to SQL Server Database",
+  "main": "app.js",
+  "dependencies": {
+    "mssql": "^6.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github-personal:thomasnorris/Node-Logger.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
