@@ -14,9 +14,8 @@
             "log_nodejs_app": {
                 "name": "SP_LogNodeJSApp",
                 "params": {
-                    "primary_app_name": "primaryAppName",
+                    "app_name": "appName",
                     "message": "message",
-                    "secondary_app_name": "secondaryAppName",
                     "log_type_ID": "logTypeID"
                 }
             }
@@ -28,6 +27,6 @@
             "error": 3
         }
     },
-    "default_app_name": "LocalRepoName",
-    "default_init_message": "App started."
+    "app_name": "Node-Logger",
+    "init_message": "App started."
 }

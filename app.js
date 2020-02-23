@@ -7,9 +7,9 @@ var _sql = require('mssql');
 var _pool = new _sql.ConnectionPool(_cfg.sql.connection);
 
 module.exports = {
-    Init: async function(message = null, appName = null) {
+    Init: async function(message = null) {
         return new Promise((resolve, reject) => {
-            this.LogInfo(message || _cfg.default_init_message, appName)
+            this.LogInfo(message || _cfg.init_message)
                 .then((msg) => {
                     resolve(msg);
                 })
@@ -18,9 +18,9 @@ module.exports = {
                 });
         });
     },
-    LogDebug: async function(message, appName = null) {
+    LogDebug: async function(message) {
         return new Promise((resolve, reject) => {
-            executeLogging(message, appName, _cfg.sql.log_types.debug)
+            executeLogging(message, _cfg.sql.log_types.debug)
                 .then((msg) => {
                     resolve(msg);
                 })
@@ -29,9 +29,9 @@ module.exports = {
                 });
         });
     },
-    LogInfo: async function(message, appName = null) {
+    LogInfo: async function(message) {
         return new Promise((resolve, reject) => {
-            executeLogging(message, appName, _cfg.sql.log_types.info)
+            executeLogging(message, _cfg.sql.log_types.info)
                 .then((msg) => {
                     resolve(msg);
                 })
@@ -40,9 +40,9 @@ module.exports = {
                 });
         });
     },
-    LogWarning: async function(message, appName = null) {
+    LogWarning: async function(message) {
         return new Promise((resolve, reject) => {
-            executeLogging(message, appName, _cfg.sql.log_types.warning)
+            executeLogging(message, _cfg.sql.log_types.warning)
                 .then((msg) => {
                     resolve(msg);
                 })
@@ -51,9 +51,9 @@ module.exports = {
                 });
         });
     },
-    LogError: async function(message, appName = null) {
+    LogError: async function(message) {
         return new Promise((resolve, reject) => {
-            executeLogging(message, appName, _cfg.sql.log_types.error)
+            executeLogging(message, _cfg.sql.log_types.error)
                 .then((msg) => {
                     resolve(msg);
                 })
@@ -86,7 +86,7 @@ async function connectDB() {
     });
 }
 
-async function executeLogging(message, appName, logTypeID) {
+async function executeLogging(message, logTypeID) {
     return new Promise((resolve, reject) => {
         (async () => {
             var sp = _cfg.sql.sp.log_nodejs_app;
@@ -94,7 +94,7 @@ async function executeLogging(message, appName, logTypeID) {
 
             // build a request that will execute sp with params
             var request = _pool.request();
-            request.input(params.primary_app_name, _sql.VarChar(_sql.MAX), appName || _cfg.default_app_name)
+            request.input(params.app_name, _sql.VarChar(_sql.MAX), _cfg.app_name)
                 .input(params.message, _sql.VarChar(_sql.MAX), message)
                 .input(params.log_type_ID, _sql.Int, logTypeID)
 
