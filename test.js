@@ -2,10 +2,9 @@
 var _logger = require('./app.js');
 
 (function() {
-
-    _logger.LogDebugAsync('testing debug async');
-    _logger.LogInfoAsync('testing info async');
-    _logger.LogWarningAsync('testing warning async');
-    _logger.LogErrorAsync('testing debug async');
-
+    //_logger.Init();
+    //_logger.Debug();
+    //_logger.Debug('message supplied');
+    //_logger.Warning('message supplied');
+    //_logger.Error('message supplied');
 })();
