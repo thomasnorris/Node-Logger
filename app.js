@@ -29,6 +29,15 @@ module.exports = {
                 });
         });
     },
+    LogDebugAsync: function(message) {
+        this.LogDebug(message)
+            .then((msg) => {
+                console.log(msg);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    },
     LogInfo: async function(message) {
         return new Promise((resolve, reject) => {
             executeLogging(message, _cfg.sql.log_types.info)
@@ -39,6 +48,15 @@ module.exports = {
                     reject(err);
                 });
         });
+    },
+    LogInfoAsync: function(message) {
+        this.LogInfo(message)
+            .then((msg) => {
+                console.log(msg);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     },
     LogWarning: async function(message) {
         return new Promise((resolve, reject) => {
@@ -51,6 +69,15 @@ module.exports = {
                 });
         });
     },
+    LogWarningAsync: function(message) {
+        this.LogWarning(message)
+            .then((msg) => {
+                console.log(msg);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    },
     LogError: async function(message) {
         return new Promise((resolve, reject) => {
             executeLogging(message, _cfg.sql.log_types.error)
@@ -61,6 +88,15 @@ module.exports = {
                     reject(err);
                 });
         });
+    },
+    LogErrorAsync: function(message) {
+        this.LogError(message)
+            .then((msg) => {
+                console.log(msg);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     }
 }
 
