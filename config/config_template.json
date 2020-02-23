@@ -31,5 +31,6 @@
     "messages": {
         "init": "App started.",
         "default": "Message not supplied."
-    }
+    },
+    "debug_mode": true
 }

@@ -21,10 +21,12 @@ module.exports = {
     Init: function() {
         this.InitPromise()
             .then((msg) => {
-                console.log(msg);
+                if (_cfg.debug_mode)
+                    console.log(msg);
             })
             .catch((err) => {
-                console.log(err);
+                if (_cfg.debug_mode)
+                    console.log(err);
             });
     },
     DebugPromise: async function(message) {
@@ -41,10 +43,12 @@ module.exports = {
     Debug: function(message) {
         this.DebugPromise(message)
             .then((msg) => {
-                console.log(msg);
+                if (_cfg.debug_mode)
+                    console.log(msg);
             })
             .catch((err) => {
-                console.log(err);
+                if (_cfg.debug_mode)
+                    console.log(err);
             });
     },
     InfoPromise: async function(message) {
@@ -61,10 +65,12 @@ module.exports = {
     Info: function(message) {
         this.InfoPromise(message)
             .then((msg) => {
-                console.log(msg);
+                if (_cfg.debug_mode)
+                    console.log(msg);
             })
             .catch((err) => {
-                console.log(err);
+                if (_cfg.debug_mode)
+                    console.log(err);
             });
     },
     WarningPromise: async function(message) {
@@ -81,10 +87,12 @@ module.exports = {
     Warning: function(message) {
         this.WarningPromise(message)
             .then((msg) => {
-                console.log(msg);
+                if (_cfg.debug_mode)
+                    console.log(msg);
             })
             .catch((err) => {
-                console.log(err);
+                if (_cfg.debug_mode)
+                    console.log(err);
             });
     },
     ErrorPromise: async function(message) {
@@ -101,10 +109,12 @@ module.exports = {
     Error: function(message) {
         this.ErrorPromise(message)
             .then((msg) => {
-                console.log(msg);
+                if (_cfg.debug_mode)
+                    console.log(msg);
             })
             .catch((err) => {
-                console.log(err);
+                if (_cfg.debug_mode)
+                    console.log(err);
             });
     }
 }
@@ -149,7 +159,7 @@ async function executeLog(message = _cfg.messages.default, logTypeID = _cfg.log_
                         .then(() => {
                             disconnectDB()
                                 .then(() => {
-                                    resolve('Execution successful.');
+                                    resolve('Logging successful.');
                                 })
                                 .catch((err) => {
                                     reject('Disconnect error: ' + err);
