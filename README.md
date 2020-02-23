@@ -1,2 +1,14 @@
-# Node-Logger
-Submodule for logging events to SQL Server Database
+## Installation
+- Add to another project as a submodule using the instructions [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules) if not done so already.
+- From the `Node-Logger` submodule:
+  - In the `config` folder:
+    - Copy/rename `config_template.json` to `config.json` and fill in appropriate settings.
+  - In the `root` folder:
+    - Run `npm install` to install required packages.
+    - Run/edit `test.js` to make sure that all connections are good to go.
+- From the local project: 
+  - Add the following lines to the top of the main program file:
+      - `var _path = require('path');`
+      - `var _logger = require(_path.resolve(__dirname, 'Node-Logger', 'app.js'));`
+        - Can be added to the global space instead with `global._logger = require(_path.resolve(__dirname, 'Node-Logger', 'app.js'));` for use in supplementary project files without multiple imports.
+  - Use `_logger.MethodName(...)` to log events.
