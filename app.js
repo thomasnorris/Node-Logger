@@ -19,7 +19,7 @@ var _exports = module.exports = {
         },
         Sync: async function() {
             if (_cfg.debug_mode)
-                this.Debug.Async(_cfg.messages.debug_mode_enabled);
+                _exports.Debug.Async(_cfg.messages.debug_mode_enabled);
             return executeLog(_cfg.messages.init, _cfg.log_types.info);
         }
     },
@@ -94,7 +94,7 @@ if (_cfg.enable_uncaught_exception_binding) {
     });
 }
 else
-    _exportsDebug.Async(_cfg.messages.uncaught_exception_binding.disabled);
+    _exports.Debug.Async(_cfg.messages.uncaught_exception_binding.disabled);
 
 async function disconnectDB() {
     return new Promise((resolve, reject) => {
