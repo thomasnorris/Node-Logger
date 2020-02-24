@@ -6,9 +6,16 @@
   - In the `root` folder:
     - Run `npm install` to install required packages.
     - Run/edit `test.js` to make sure that all connections are good to go.
-- From the local project: 
-  - Add the following lines to the top of the main program file:
-      - `var _path = require('path');`
-      - `var _logger = require(_path.resolve(__dirname, 'Node-Logger', 'app.js'));`
-        - Can be added to the global space instead with `global._logger = require(_path.resolve(__dirname, 'Node-Logger', 'app.js'));` for use in supplementary project files without multiple imports.
-  - Use `_logger.MethodName(...)` to log events.
+## Usage
+- Import and initialize like so:
+    ```javascript
+    (async function() {
+      var _path = require('path');
+      var _logger = require(_path.resolve(__dirname, 'Node-Logger', 'app.js'));
+      await _logger.Init();
+
+      // rest of program code here
+    })();
+    ```
+- `_logger.MethodName.Async(...);` to log fire-and-forget events.
+- `_logger.MethodName.Sync(...).then(...).catch(...);` to log events that must be synchronous.
