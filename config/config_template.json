@@ -12,8 +12,8 @@
             }
         },
         "sp": {
-            "log_nodejs_app": {
-                "name": "SP_LogNodeJSApp",
+            "log_node_app": {
+                "name": "SP_LogNodeApp",
                 "params": {
                     "app_name": "appName",
                     "message": "message",

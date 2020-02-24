@@ -9,7 +9,7 @@ var _pool = new _sql.ConnectionPool(_cfg.sql.connection);
 module.exports = {
     InitPromise: async function() {
         return new Promise((resolve, reject) => {
-            this.DebugPromise(_cfg.messages.init)
+            this.InfoPromise(_cfg.messages.init)
                 .then((msg) => {
                     resolve(msg);
                 })
@@ -144,7 +144,7 @@ async function connectDB() {
 async function executeLog(message = _cfg.messages.default, logTypeID = _cfg.log_types.debug) {
     return new Promise((resolve, reject) => {
         (async () => {
-            var sp = _cfg.sql.sp.log_nodejs_app;
+            var sp = _cfg.sql.sp.log_node_app;
             var params = sp.params;
 
             // build a request that will execute sp with params
