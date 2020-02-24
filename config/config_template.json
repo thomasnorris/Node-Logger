@@ -1,7 +1,6 @@
 {
     "app_name": "Node-Logger",
     "debug_mode": true,
-    "enable_uncaught_exception_binding": true,
     "sql": {
         "connection": {
             "user": "username",
@@ -28,16 +27,10 @@
         "debug": 0,
         "info": 1,
         "warning": 2,
-        "error": ,
-        "uncaught_exception": 4
+        "error": 3
     },
     "messages": {
         "init": "App started.",
-        "default": "Message not supplied.",
-        "uncaught_exception_binding": {
-            "enabled": "Uncaught exception binding enabled for this app.",
-            "disabled": "Uncaught exception binding disabled for this app."
-        },
-        "debug_mode_enabled": "Logging debug mode enabled for this app."
+        "default": "Message not supplied."
     }
 }

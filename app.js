@@ -6,95 +6,129 @@ var _cfg = readJson(CFG_FILE);
 var _sql = require('mssql');
 var _pool = new _sql.ConnectionPool(_cfg.sql.connection);
 
-var _exports = module.exports = {
-    Init: {
-        Async: function() {
-            this.Sync()
-                .then((msg) => {
-                    console.log(msg);
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        },
-        Sync: async function() {
-            if (_cfg.debug_mode)
-                _exports.Debug.Async(_cfg.messages.debug_mode_enabled);
-            return executeLog(_cfg.messages.init, _cfg.log_types.info);
-        }
+process.on('uncaughtException', (exception) => {
+    console.log(exception);
+    executeLog(exception, _cfg.log_types.debug)
+        .then((msg) => {
+            process.exit(0);
+        })
+        .catch((err) => {
+            process.exit(0);
+        });
+});
+
+process.on('unhandledRejection', (rejection) => {
+    console.log(rejection);
+    executeLog(rejection, _cfg.log_types.debug)
+        .then((msg) => {
+            process.exit(0);
+        })
+        .catch((err) => {
+            process.exit(0);
+        });
+});
+
+module.exports = {
+    Init: function() {
+        return executeLog(_cfg.messages.init, _cfg.log_types.info);
     },
     Debug: {
         Async: function(message) {
             this.Sync(message)
                 .then((msg) => {
-                    console.log(msg);
                 })
                 .catch((err) => {
-                    console.log(err);
                 });
         },
         Sync: async function(message) {
-            return executeLog(message, _cfg.log_types.debug);
+            return new Promise((resolve, reject) => {
+                executeLog(message, _cfg.log_types.debug)
+                    .then((msg) => {
+                        if (_cfg.debug_mode)
+                            console.log(msg);
+                        resolve(msg);
+                    })
+                    .catch((err) => {
+                        if (_cfg.debug_mode)
+                            console.log(err);
+                        reject(msg);
+                    });
+            });
         }
     },
     Info: {
         Async: function(message) {
             this.Sync(message)
                 .then((msg) => {
-                    console.log(msg);
                 })
                 .catch((err) => {
-                    console.log(err);
                 });
         },
         Sync: async function(message) {
-            return executeLog(message, _cfg.log_types.info);
+            return new Promise((resolve, reject) => {
+                executeLog(message, _cfg.log_types.info)
+                    .then((msg) => {
+                        if (_cfg.debug_mode)
+                            console.log(msg);
+                        resolve(msg);
+                    })
+                    .catch((err) => {
+                        if (_cfg.debug_mode)
+                            console.log(err);
+                        reject(msg);
+                    });
+            });
         }
     },
     Warning: {
         Async: function(message) {
             this.Sync(message)
                 .then((msg) => {
-                    console.log(msg);
                 })
                 .catch((err) => {
-                    console.log(err);
                 });
         },
         Sync: async function(message) {
-            return executeLog(message, _cfg.log_types.warning);
+            return new Promise((resolve, reject) => {
+                executeLog(message, _cfg.log_types.warning)
+                    .then((msg) => {
+                        if (_cfg.debug_mode)
+                            console.log(msg);
+                        resolve(msg);
+                    })
+                    .catch((err) => {
+                        if (_cfg.debug_mode)
+                            console.log(err);
+                        reject(msg);
+                    });
+            });
         }
     },
     Error: {
         Async: function(message) {
             this.Sync(message)
                 .then((msg) => {
-                    console.log(msg);
                 })
                 .catch((err) => {
-                    console.log(err);
                 });
         },
         Sync: async function(message) {
-            return executeLog(message, _cfg.log_types.error);
+            return new Promise((resolve, reject) => {
+                executeLog(message, _cfg.log_types.error)
+                    .then((msg) => {
+                        if (_cfg.debug_mode)
+                            console.log(msg);
+                        resolve(msg);
+                    })
+                    .catch((err) => {
+                        if (_cfg.debug_mode)
+                            console.log(err);
+                        reject(msg);
+                    });
+            });
         }
     },
 }
-
-if (_cfg.enable_uncaught_exception_binding) {
-    _exports.Debug.Async(_cfg.messages.uncaught_exception_binding.enabled);
-    process.on('uncaughtException', (exception) => {
-        executeLog(exception, _cfg.log_types.uncaught_exception)
-            .then((msg) => {
-                throw(exception);
-            })
-            .catch((err) => {
-                throw(exception);
-            });
-    });
-}
-else
-    _exports.Debug.Async(_cfg.messages.uncaught_exception_binding.disabled);
 
 async function disconnectDB() {
     return new Promise((resolve, reject) => {
@@ -136,7 +170,7 @@ async function executeLog(message = _cfg.messages.default, logTypeID = _cfg.log_
                         .then(() => {
                             disconnectDB()
                                 .then(() => {
-                                    resolve('Logging successful.');
+                                    resolve('Logged "' + message + '".');
                                 })
                                 .catch((err) => {
                                     reject('Disconnect error: ' + err);
