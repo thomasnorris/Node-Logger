@@ -6,118 +6,95 @@ var _cfg = readJson(CFG_FILE);
 var _sql = require('mssql');
 var _pool = new _sql.ConnectionPool(_cfg.sql.connection);
 
-module.exports = {
-    InitPromise: async function() {
-        return new Promise((resolve, reject) => {
-            this.InfoPromise(_cfg.messages.init)
+var _exports = module.exports = {
+    Init: {
+        Async: function() {
+            this.Sync()
                 .then((msg) => {
-                    resolve(msg);
+                    console.log(msg);
                 })
                 .catch((err) => {
-                    reject(err);
-                });
-        });
-    },
-    Init: function() {
-        this.InitPromise()
-            .then((msg) => {
-                if (_cfg.debug_mode)
-                    console.log(msg);
-            })
-            .catch((err) => {
-                if (_cfg.debug_mode)
                     console.log(err);
-            });
+                });
+        },
+        Sync: async function() {
+            if (_cfg.debug_mode)
+                this.Debug.Async(_cfg.messages.debug_mode_enabled);
+            return executeLog(_cfg.messages.init, _cfg.log_types.info);
+        }
     },
-    DebugPromise: async function(message) {
-        return new Promise((resolve, reject) => {
-            executeLog(message, _cfg.log_types.debug)
+    Debug: {
+        Async: function(message) {
+            this.Sync(message)
                 .then((msg) => {
-                    resolve(msg);
+                    console.log(msg);
                 })
                 .catch((err) => {
-                    reject(err);
-                });
-        });
-    },
-    Debug: function(message) {
-        this.DebugPromise(message)
-            .then((msg) => {
-                if (_cfg.debug_mode)
-                    console.log(msg);
-            })
-            .catch((err) => {
-                if (_cfg.debug_mode)
                     console.log(err);
-            });
+                });
+        },
+        Sync: async function(message) {
+            return executeLog(message, _cfg.log_types.debug);
+        }
     },
-    InfoPromise: async function(message) {
-        return new Promise((resolve, reject) => {
-            executeLog(message, _cfg.log_types.info)
+    Info: {
+        Async: function(message) {
+            this.Sync(message)
                 .then((msg) => {
-                    resolve(msg);
+                    console.log(msg);
                 })
                 .catch((err) => {
-                    reject(err);
-                });
-        });
-    },
-    Info: function(message) {
-        this.InfoPromise(message)
-            .then((msg) => {
-                if (_cfg.debug_mode)
-                    console.log(msg);
-            })
-            .catch((err) => {
-                if (_cfg.debug_mode)
                     console.log(err);
-            });
+                });
+        },
+        Sync: async function(message) {
+            return executeLog(message, _cfg.log_types.info);
+        }
     },
-    WarningPromise: async function(message) {
-        return new Promise((resolve, reject) => {
-            executeLog(message, _cfg.log_types.warning)
+    Warning: {
+        Async: function(message) {
+            this.Sync(message)
                 .then((msg) => {
-                    resolve(msg);
+                    console.log(msg);
                 })
                 .catch((err) => {
-                    reject(err);
-                });
-        });
-    },
-    Warning: function(message) {
-        this.WarningPromise(message)
-            .then((msg) => {
-                if (_cfg.debug_mode)
-                    console.log(msg);
-            })
-            .catch((err) => {
-                if (_cfg.debug_mode)
                     console.log(err);
-            });
+                });
+        },
+        Sync: async function(message) {
+            return executeLog(message, _cfg.log_types.warning);
+        }
     },
-    ErrorPromise: async function(message) {
-        return new Promise((resolve, reject) => {
-            executeLog(message, _cfg.log_types.error)
+    Error: {
+        Async: function(message) {
+            this.Sync(message)
                 .then((msg) => {
-                    resolve(msg);
+                    console.log(msg);
                 })
                 .catch((err) => {
-                    reject(err);
-                });
-        });
-    },
-    Error: function(message) {
-        this.ErrorPromise(message)
-            .then((msg) => {
-                if (_cfg.debug_mode)
-                    console.log(msg);
-            })
-            .catch((err) => {
-                if (_cfg.debug_mode)
                     console.log(err);
-            });
-    }
+                });
+        },
+        Sync: async function(message) {
+            return executeLog(message, _cfg.log_types.error);
+        }
+    },
 }
+
+if (_cfg.enable_uncaught_exception_binding) {
+    _exports.Debug.Async(_cfg.messages.uncaught_exception_binding.enabled);
+    process.on('uncaughtException', (exception) => {
+        executeLog(exception, _cfg.log_types.uncaught_exception)
+            .then((msg) => {
+                throw(exception);
+            })
+            .catch((err) => {
+                throw(exception);
+            });
+    });
+}
+else
+    _exportsDebug.Async(_cfg.messages.uncaught_exception_binding.disabled);
 
 async function disconnectDB() {
     return new Promise((resolve, reject) => {
