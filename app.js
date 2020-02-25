@@ -7,32 +7,33 @@ var _mysql = require('mysql');
 var _pool = _mysql.createPool(_cfg.sql.connection);
 
 process.on('uncaughtException', (exception) => {
-    var msg = 'Uncaught exception: ""' + exception + '"".';
+    var msg = exception.stack || exception;
     console.log(msg);
     executeLog(msg, _cfg.log_types.critical)
-        .then((msg) => {
+        .then(() => {
             process.exit(0);
         })
-        .catch((err) => {
+        .catch(() => {
             process.exit(0);
         });
 });
 
 process.on('unhandledRejection', (rejection) => {
-    var msg = 'Unhandled promise rejection: ""' + rejection + '"".';
+    var msg = rejection.stack || rejection;
     console.log(msg);
     executeLog(msg, _cfg.log_types.critical)
-        .then((msg) => {
+        .then(() => {
             process.exit(0);
         })
-        .catch((err) => {
+        .catch(() => {
             process.exit(0);
         });
 });
 
 module.exports = {
-    Init: function() {
-        return executeLog(_cfg.messages.init, _cfg.log_types.info);
+    Init: function(cb) {
+        return executeLog(_cfg.messages.init, _cfg.log_types.info)
+            .then(cb);
     },
     Debug: {
         Async: function(message) {
@@ -135,12 +136,12 @@ module.exports = {
 async function executeLog(message = _cfg.messages.default, logTypeID = _cfg.log_types.debug) {
     return new Promise((resolve, reject) => {
         (async () => {
-            var query = 'call ' + _cfg.sql.connection.database + '.' + _cfg.sql.sp.log_node_app + '(';
-            query += stringify(_cfg.app_name) + ', ' + logTypeID + ', ' + stringify(message) + ');';
-
             _pool.getConnection((err, connection) => {
                 if (err)
                     reject(err);
+
+                var query = 'call ' + _cfg.sql.connection.database + '.' + _cfg.sql.sp.log_node_app + '(';
+                query += connection.escape(_cfg.app_name) + ', ' + connection.escape(logTypeID) + ', ' + connection.escape(message) + ');';
 
                 connection.query(query, (err, res, fields) => {
                     connection.release();
@@ -152,10 +153,6 @@ async function executeLog(message = _cfg.messages.default, logTypeID = _cfg.log_
             });
         })();
     });
-}
-
-function stringify(str) {
-    return '"' + str + '"';
 }
 
 function readJson(filePath) {

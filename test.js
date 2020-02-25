@@ -1,7 +1,9 @@
 
 var _logger = require('./app.js');
 
-(async function() {
+(async () => {
     await _logger.Init();
-    _logger.poo();
+    throw(p);
 })();
+
+
