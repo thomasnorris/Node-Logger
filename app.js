@@ -7,8 +7,9 @@ var _sql = require('mssql');
 var _pool = new _sql.ConnectionPool(_cfg.sql.connection);
 
 process.on('uncaughtException', (exception) => {
-    console.log(exception);
-    executeLog(exception, _cfg.log_types.debug)
+    var msg = 'Uncaught exception: "' + exception + '".';
+    console.log(msg);
+    executeLog(msg, _cfg.log_types.critical)
         .then((msg) => {
             process.exit(0);
         })
@@ -18,8 +19,9 @@ process.on('uncaughtException', (exception) => {
 });
 
 process.on('unhandledRejection', (rejection) => {
-    console.log(rejection);
-    executeLog(rejection, _cfg.log_types.debug)
+    var msg = 'Unhandled promise rejection: "' + rejection + '".';
+    console.log(msg);
+    executeLog(msg, _cfg.log_types.critical)
         .then((msg) => {
             process.exit(0);
         })
@@ -123,7 +125,7 @@ module.exports = {
                     .catch((err) => {
                         if (_cfg.debug_mode)
                             console.log(err);
-                        reject(msg);
+                        reject(err);
                     });
             });
         }
