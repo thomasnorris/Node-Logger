@@ -3,24 +3,14 @@
     "debug_mode": true,
     "sql": {
         "connection": {
-            "user": "username",
-            "password": "password",
-            "server": "localhost\\sqlexpress",
+            "host": "host",
             "database": "Database",
-            "port": 1433,
-            "options": {
-                "enableArithAbort": true
-            }
+            "user": "user",
+            "password": "password",
+            "port": 3306
         },
         "sp": {
-            "log_node_app": {
-                "name": "SP_LogNodeApp",
-                "params": {
-                    "app_name": "appName",
-                    "message": "message",
-                    "log_type_ID": "logTypeID"
-                }
-            }
+            "log_node_app": "SP_LogNodeApp"
         }
     },
     "log_types": {

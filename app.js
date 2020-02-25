@@ -3,8 +3,8 @@ var _path = require('path');
 const CFG_FILE = _path.resolve(__dirname, 'config', 'config.json');
 var _cfg = readJson(CFG_FILE);
 
-var _sql = require('mssql');
-var _pool = new _sql.ConnectionPool(_cfg.sql.connection);
+var _mysql = require('mysql');
+var _pool = _mysql.createPool(_cfg.sql.connection);
 
 process.on('uncaughtException', (exception) => {
     var msg = 'Uncaught exception: "' + exception + '".';
@@ -157,37 +157,63 @@ async function connectDB() {
 async function executeLog(message = _cfg.messages.default, logTypeID = _cfg.log_types.debug) {
     return new Promise((resolve, reject) => {
         (async () => {
-            var sp = _cfg.sql.sp.log_node_app;
-            var params = sp.params;
+            var query = 'call ' + _cfg.sql.connection.database + '.' + _cfg.sql.sp.log_node_app + '(';
+            query += stringify(_cfg.app_name) + ', ' + logTypeID + ', ' + stringify(message) + ');';
 
-            // build a request that will execute sp with params
-            var request = _pool.request();
-            request.input(params.app_name, _sql.VarChar(_sql.MAX), _cfg.app_name)
-                .input(params.message, _sql.VarChar(_sql.MAX), message)
-                .input(params.log_type_ID, _sql.Int, logTypeID)
+            _pool.getConnection((err, connection) => {
+                if (err)
+                    reject(err);
 
-            connectDB()
-                .then(() => {
-                    request.execute(sp.name)
-                        .then(() => {
-                            disconnectDB()
-                                .then(() => {
-                                    resolve('Logged "' + message + '".');
-                                })
-                                .catch((err) => {
-                                    reject('Disconnect error: ' + err);
-                                });
-                        })
-                        .catch((err) => {
-                            reject('SP execution error: ' + err);
-                        });
-                })
-                .catch((err) => {
-                    reject('Connection error: ' + err);
+                connection.query(query, (err, res, fields) => {
+                    connection.release();
+                    if (err)
+                        reject(err);
+                    else
+                        resolve(res);
                 });
+            });
         })();
     });
 }
+
+function stringify(str) {
+    return '"' + str + '"';
+}
+
+// async function executeLog(message = _cfg.messages.default, logTypeID = _cfg.log_types.debug) {
+//     return new Promise((resolve, reject) => {
+//         (async () => {
+//             var sp = _cfg.sql.sp.log_node_app;
+//             var params = sp.params;
+
+//             // build a request that will execute sp with params
+//             var request = _pool.request();
+//             request.input(params.app_name, _sql.VarChar(_sql.MAX), _cfg.app_name)
+//                 .input(params.message, _sql.VarChar(_sql.MAX), message)
+//                 .input(params.log_type_ID, _sql.Int, logTypeID)
+
+//             connectDB()
+//                 .then(() => {
+//                     request.execute(sp.name)
+//                         .then(() => {
+//                             disconnectDB()
+//                                 .then(() => {
+//                                     resolve('Logged "' + message + '".');
+//                                 })
+//                                 .catch((err) => {
+//                                     reject('Disconnect error: ' + err);
+//                                 });
+//                         })
+//                         .catch((err) => {
+//                             reject('SP execution error: ' + err);
+//                         });
+//                 })
+//                 .catch((err) => {
+//                     reject('Connection error: ' + err);
+//                 });
+//         })();
+//     });
+// }
 
 function readJson(filePath) {
     var fs = require('fs');

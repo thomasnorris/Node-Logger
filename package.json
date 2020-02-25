@@ -4,7 +4,7 @@
   "description": "Submodule for logging events to SQL Server Database",
   "main": "app.js",
   "dependencies": {
-    "mssql": "^6.1.0"
+    "mysql": "^2.18.1"
   },
   "devDependencies": {},
   "scripts": {
