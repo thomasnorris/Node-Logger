@@ -32,15 +32,14 @@ process.on('unhandledRejection', (rejection) => {
 
 module.exports = {
     Init: function(cb) {
-        return executeLog(_cfg.messages.init, _cfg.log_types.info)
-            .then(cb);
+        return executeLog(_cfg.messages.init, _cfg.log_types.info);
     },
     Debug: {
         Async: function(message) {
             this.Sync(message)
-                .then((msg) => {
+                .then(() => {
                 })
-                .catch((err) => {
+                .catch(() => {
                 });
         },
         Sync: async function(message) {
@@ -138,18 +137,19 @@ async function executeLog(message = _cfg.messages.default, logTypeID = _cfg.log_
         (async () => {
             _pool.getConnection((err, connection) => {
                 if (err)
-                    reject(err);
+                    resolve(err);
+                else {
+                    var query = 'call ' + _cfg.sql.connection.database + '.' + _cfg.sql.sp.log_node_app + '(';
+                    query += connection.escape(_cfg.app_name) + ', ' + connection.escape(logTypeID) + ', ' + connection.escape(message) + ');';
 
-                var query = 'call ' + _cfg.sql.connection.database + '.' + _cfg.sql.sp.log_node_app + '(';
-                query += connection.escape(_cfg.app_name) + ', ' + connection.escape(logTypeID) + ', ' + connection.escape(message) + ');';
-
-                connection.query(query, (err, res, fields) => {
-                    connection.release();
-                    if (err)
-                        reject(err);
-                    else
-                        resolve(res);
-                });
+                    connection.query(query, (err, res, fields) => {
+                        connection.release();
+                        if (err)
+                            resolve(err);
+                        else
+                            resolve(res);
+                    });
+                }
             });
         })();
     });
