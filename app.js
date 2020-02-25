@@ -7,7 +7,7 @@ var _mysql = require('mysql');
 var _pool = _mysql.createPool(_cfg.sql.connection);
 
 process.on('uncaughtException', (exception) => {
-    var msg = 'Uncaught exception: "' + exception + '".';
+    var msg = 'Uncaught exception: ""' + exception + '"".';
     console.log(msg);
     executeLog(msg, _cfg.log_types.critical)
         .then((msg) => {
@@ -19,7 +19,7 @@ process.on('uncaughtException', (exception) => {
 });
 
 process.on('unhandledRejection', (rejection) => {
-    var msg = 'Unhandled promise rejection: "' + rejection + '".';
+    var msg = 'Unhandled promise rejection: ""' + rejection + '"".';
     console.log(msg);
     executeLog(msg, _cfg.log_types.critical)
         .then((msg) => {
@@ -132,28 +132,6 @@ module.exports = {
     },
 }
 
-async function disconnectDB() {
-    return new Promise((resolve, reject) => {
-        _pool.close()
-            .then(() => {
-                resolve('Disconnected.');
-            }).catch((err) => {
-                reject(err);
-            });
-    });
-}
-
-async function connectDB() {
-    return new Promise((resolve, reject) => {
-        _pool.connect()
-            .then(() => {
-                resolve('Connected.');
-            }).catch((err) => {
-                reject(err);
-            });
-    });
-}
-
 async function executeLog(message = _cfg.messages.default, logTypeID = _cfg.log_types.debug) {
     return new Promise((resolve, reject) => {
         (async () => {
@@ -179,41 +157,6 @@ async function executeLog(message = _cfg.messages.default, logTypeID = _cfg.log_
 function stringify(str) {
     return '"' + str + '"';
 }
-
-// async function executeLog(message = _cfg.messages.default, logTypeID = _cfg.log_types.debug) {
-//     return new Promise((resolve, reject) => {
-//         (async () => {
-//             var sp = _cfg.sql.sp.log_node_app;
-//             var params = sp.params;
-
-//             // build a request that will execute sp with params
-//             var request = _pool.request();
-//             request.input(params.app_name, _sql.VarChar(_sql.MAX), _cfg.app_name)
-//                 .input(params.message, _sql.VarChar(_sql.MAX), message)
-//                 .input(params.log_type_ID, _sql.Int, logTypeID)
-
-//             connectDB()
-//                 .then(() => {
-//                     request.execute(sp.name)
-//                         .then(() => {
-//                             disconnectDB()
-//                                 .then(() => {
-//                                     resolve('Logged "' + message + '".');
-//                                 })
-//                                 .catch((err) => {
-//                                     reject('Disconnect error: ' + err);
-//                                 });
-//                         })
-//                         .catch((err) => {
-//                             reject('SP execution error: ' + err);
-//                         });
-//                 })
-//                 .catch((err) => {
-//                     reject('Connection error: ' + err);
-//                 });
-//         })();
-//     });
-// }
 
 function readJson(filePath) {
     var fs = require('fs');
