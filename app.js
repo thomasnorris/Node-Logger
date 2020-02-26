@@ -130,7 +130,7 @@ module.exports = {
     },
 }
 
-async function executeLog(message = _cfg.messages.default, details = '',logTypeID = _cfg.log_types.debug) {
+async function executeLog(message = _cfg.messages.default, details = '', logTypeID = _cfg.log_types.debug) {
     return new Promise((resolve, reject) => {
         (async () => {
             _pool.getConnection((err, connection) => {
@@ -138,7 +138,7 @@ async function executeLog(message = _cfg.messages.default, details = '',logTypeI
                     resolve(err);
                 else {
                     var query = 'call ' + _cfg.sql.connection.database + '.' + _cfg.sql.sp.log_node_app + '(';
-                    query += connection.escape(_cfg.app_name) + ', ' + connection.escape(logTypeID) + ', ';
+                    query += connection.escape(_cfg.app_ID) + ', ' + connection.escape(logTypeID) + ', ';
                     query += connection.escape(message) + ', ' + connection.escape(details)  + ');';
 
                     connection.query(query, (err, res, fields) => {
