@@ -21,7 +21,7 @@
         "critical": 5
     },
     "messages": {
-        "init": "App started.",
-        "default": "Message not supplied."
+        "init": "App started",
+        "default": "Message not supplied"
     }
 }
