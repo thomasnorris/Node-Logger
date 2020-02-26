@@ -3,48 +3,46 @@ var _path = require('path');
 const CFG_FILE = _path.resolve(__dirname, 'config', 'config.json');
 var _cfg = readJson(CFG_FILE);
 
-var _sql = require('mssql');
-var _pool = new _sql.ConnectionPool(_cfg.sql.connection);
+var _mysql = require('mysql');
+var _pool = _mysql.createPool(_cfg.sql.connection);
 
 process.on('uncaughtException', (exception) => {
-    var msg = 'Uncaught exception: "' + exception + '".';
-    console.log(msg);
-    executeLog(msg, _cfg.log_types.critical)
-        .then((msg) => {
+    console.log(exception);
+    executeLog('Uncaught exception.', exception.stack || exception, _cfg.log_types.critical)
+        .then(() => {
             process.exit(0);
         })
-        .catch((err) => {
+        .catch(() => {
             process.exit(0);
         });
 });
 
 process.on('unhandledRejection', (rejection) => {
-    var msg = 'Unhandled promise rejection: "' + rejection + '".';
-    console.log(msg);
-    executeLog(msg, _cfg.log_types.critical)
-        .then((msg) => {
+    console.log(rejection);
+    executeLog('Unhandled promise rejection.', rejection.stack || rejection, _cfg.log_types.critical)
+        .then(() => {
             process.exit(0);
         })
-        .catch((err) => {
+        .catch(() => {
             process.exit(0);
         });
 });
 
 module.exports = {
-    Init: function() {
-        return executeLog(_cfg.messages.init, _cfg.log_types.info);
+    Init: function(cb) {
+        return executeLog(_cfg.messages.init, '', _cfg.log_types.info);
     },
     Debug: {
-        Async: function(message) {
-            this.Sync(message)
-                .then((msg) => {
+        Async: function(message, details) {
+            this.Sync(message, details)
+                .then(() => {
                 })
-                .catch((err) => {
+                .catch(() => {
                 });
         },
-        Sync: async function(message) {
+        Sync: async function(message, details) {
             return new Promise((resolve, reject) => {
-                executeLog(message, _cfg.log_types.debug)
+                executeLog(message, details, _cfg.log_types.debug)
                     .then((msg) => {
                         if (_cfg.debug_mode)
                             console.log(msg);
@@ -59,16 +57,16 @@ module.exports = {
         }
     },
     Info: {
-        Async: function(message) {
-            this.Sync(message)
+        Async: function(message, details) {
+            this.Sync(message, details)
                 .then((msg) => {
                 })
                 .catch((err) => {
                 });
         },
-        Sync: async function(message) {
+        Sync: async function(message, details) {
             return new Promise((resolve, reject) => {
-                executeLog(message, _cfg.log_types.info)
+                executeLog(message, details, _cfg.log_types.info)
                     .then((msg) => {
                         if (_cfg.debug_mode)
                             console.log(msg);
@@ -83,16 +81,16 @@ module.exports = {
         }
     },
     Warning: {
-        Async: function(message) {
-            this.Sync(message)
+        Async: function(message, details) {
+            this.Sync(message, details)
                 .then((msg) => {
                 })
                 .catch((err) => {
                 });
         },
-        Sync: async function(message) {
+        Sync: async function(message, details) {
             return new Promise((resolve, reject) => {
-                executeLog(message, _cfg.log_types.warning)
+                executeLog(message, details, _cfg.log_types.warning)
                     .then((msg) => {
                         if (_cfg.debug_mode)
                             console.log(msg);
@@ -107,16 +105,16 @@ module.exports = {
         }
     },
     Error: {
-        Async: function(message) {
-            this.Sync(message)
+        Async: function(message, details) {
+            this.Sync(message, details)
                 .then((msg) => {
                 })
                 .catch((err) => {
                 });
         },
-        Sync: async function(message) {
+        Sync: async function(message, details) {
             return new Promise((resolve, reject) => {
-                executeLog(message, _cfg.log_types.error)
+                executeLog(message, details, _cfg.log_types.error)
                     .then((msg) => {
                         if (_cfg.debug_mode)
                             console.log(msg);
@@ -132,59 +130,26 @@ module.exports = {
     },
 }
 
-async function disconnectDB() {
-    return new Promise((resolve, reject) => {
-        _pool.close()
-            .then(() => {
-                resolve('Disconnected.');
-            }).catch((err) => {
-                reject(err);
-            });
-    });
-}
-
-async function connectDB() {
-    return new Promise((resolve, reject) => {
-        _pool.connect()
-            .then(() => {
-                resolve('Connected.');
-            }).catch((err) => {
-                reject(err);
-            });
-    });
-}
-
-async function executeLog(message = _cfg.messages.default, logTypeID = _cfg.log_types.debug) {
+async function executeLog(message = _cfg.messages.default, details = '',logTypeID = _cfg.log_types.debug) {
     return new Promise((resolve, reject) => {
         (async () => {
-            var sp = _cfg.sql.sp.log_node_app;
-            var params = sp.params;
+            _pool.getConnection((err, connection) => {
+                if (err)
+                    resolve(err);
+                else {
+                    var query = 'call ' + _cfg.sql.connection.database + '.' + _cfg.sql.sp.log_node_app + '(';
+                    query += connection.escape(_cfg.app_name) + ', ' + connection.escape(logTypeID) + ', ';
+                    query += connection.escape(message) + ', ' + connection.escape(details)  + ');';
 
-            // build a request that will execute sp with params
-            var request = _pool.request();
-            request.input(params.app_name, _sql.VarChar(_sql.MAX), _cfg.app_name)
-                .input(params.message, _sql.VarChar(_sql.MAX), message)
-                .input(params.log_type_ID, _sql.Int, logTypeID)
-
-            connectDB()
-                .then(() => {
-                    request.execute(sp.name)
-                        .then(() => {
-                            disconnectDB()
-                                .then(() => {
-                                    resolve('Logged "' + message + '".');
-                                })
-                                .catch((err) => {
-                                    reject('Disconnect error: ' + err);
-                                });
-                        })
-                        .catch((err) => {
-                            reject('SP execution error: ' + err);
-                        });
-                })
-                .catch((err) => {
-                    reject('Connection error: ' + err);
-                });
+                    connection.query(query, (err, res, fields) => {
+                        connection.release();
+                        if (err)
+                            resolve(err);
+                        else
+                            resolve(res);
+                    });
+                }
+            });
         })();
     });
 }
