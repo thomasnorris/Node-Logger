@@ -7,9 +7,8 @@ var _mysql = require('mysql');
 var _pool = _mysql.createPool(_cfg.sql.connection);
 
 process.on('uncaughtException', (exception) => {
-    var msg = exception.stack || exception;
-    console.log(msg);
-    executeLog(msg, _cfg.log_types.critical)
+    console.log(exception);
+    executeLog('Uncaught exception.', exception.stack || exception, _cfg.log_types.critical)
         .then(() => {
             process.exit(0);
         })
@@ -19,9 +18,8 @@ process.on('uncaughtException', (exception) => {
 });
 
 process.on('unhandledRejection', (rejection) => {
-    var msg = rejection.stack || rejection;
-    console.log(msg);
-    executeLog(msg, _cfg.log_types.critical)
+    console.log(rejection);
+    executeLog('Unhandled promise rejection.', rejection.stack || rejection, _cfg.log_types.critical)
         .then(() => {
             process.exit(0);
         })
