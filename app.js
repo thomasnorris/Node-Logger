@@ -10,11 +10,21 @@ var _pool = _mysql.createPool(_cfg.sql.connection);
 // otherwise there will be an infinite loop of console.log calls
 // taken from here: https://stackoverflow.com/a/39049036
 var cl = console.log;
-console.log = function(...args) {
+console.log = async function(...args) {
     if (!_cfg.debug_mode) {
-        var str = args.toString().split(',').join(' ');
-        module.exports.Debug.Async('console.log called', str);
+        return new Promise((resolve, reject) => {
+            var str = args.toString().split(',').join(' ');
+            cl.apply(console, args);
+            module.exports.Debug.Sync('console.log called', str)
+                .then((res) => {
+                    resolve(res);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        });
     }
+
     cl.apply(console, args);
 }
 
