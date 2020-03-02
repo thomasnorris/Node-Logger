@@ -6,9 +6,22 @@ var _cfg = readJson(CFG_FILE);
 var _mysql = require('mysql');
 var _pool = _mysql.createPool(_cfg.sql.connection);
 
+// override console.log function UNLESS we are in debug mode
+// otherwise there will be an infinite loop of console.log calls
+// taken from here: https://stackoverflow.com/a/39049036
+var cl = console.log;
+console.log = function(...args) {
+    if (!_cfg.debug_mode) {
+        var str = args.toString().split(',').join(' ');
+        module.exports.Debug.Async('console.log called', str);
+    }
+    cl.apply(console, args);
+}
+
+// catch uncaught exceptions and log them
 process.on('uncaughtException', (exception) => {
     console.log(exception);
-    executeLog('Uncaught exception', exception.stack || exception, _cfg.log_types.critical)
+    executeLog(_cfg.messages.uncaught_exception, exception.stack || exception, _cfg.log_types.critical)
         .then(() => {
             process.exit(0);
         })
@@ -16,10 +29,10 @@ process.on('uncaughtException', (exception) => {
             process.exit(0);
         });
 });
-
+// catch unhandled rejections and log them
 process.on('unhandledRejection', (rejection) => {
     console.log(rejection);
-    executeLog('Unhandled promise rejection', rejection.stack || rejection, _cfg.log_types.critical)
+    executeLog(_cfg.messages.unhandled_rejection, rejection.stack || rejection, _cfg.log_types.critical)
         .then(() => {
             process.exit(0);
         })
@@ -30,6 +43,9 @@ process.on('unhandledRejection', (rejection) => {
 
 module.exports = {
     Init: function(cb) {
+        if (_cfg.debug_mode)
+            console.log(_cfg.messages.debug_mode_enabled);
+
         return executeLog(_cfg.messages.init, '', _cfg.log_types.info);
     },
     Debug: {

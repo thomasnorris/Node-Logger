@@ -1,6 +1,6 @@
 {
     "app_ID": "1",
-    "debug_mode": true,
+    "debug_mode": false,
     "sql": {
         "connection": {
             "host": "host",
@@ -22,6 +22,9 @@
     },
     "messages": {
         "init": "App started",
-        "default": "Message not supplied"
+        "default": "Message not supplied",
+        "debug_mode_enabled": "Debug mode enabled, logging responses will output to the console window",
+        "uncaught_exception": "Uncaught exception",
+        "unhandled_rejection": "Unhandled promise rejection"
     }
 }
