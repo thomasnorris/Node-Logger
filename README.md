@@ -7,15 +7,13 @@
     - Run `npm install` to install required packages.
     - Run/edit `test.js` to make sure that all connections are good to go.
 ## Usage
-- Import and initialize like so:
+- Import and initialize like so at the very top of the file, before anything else:
     ```javascript
-    (async function() {
       var _path = require('path');
       var _logger = require(_path.resolve(__dirname, 'Node-Logger', 'app.js'));
-      await _logger.Init();
+      _logger.Init();
 
       // rest of program code here
-    })();
     ```
 - `_logger.MethodName.Async(...);` to log fire-and-forget events.
 - `_logger.MethodName.Sync(...).then(...).catch(...);` to log events that must be synchronous.
