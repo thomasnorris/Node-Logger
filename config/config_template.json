@@ -18,7 +18,8 @@
         "info": 2,
         "warning": 3,
         "error": 4,
-        "critical": 5
+        "critical": 5,
+        "init": 6
     },
     "messages": {
         "init": "App started",

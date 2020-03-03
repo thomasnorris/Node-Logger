@@ -2,10 +2,10 @@
 var _logger = require('./app.js');
 
 (async () => {
-    await _logger.Init();
-    await _logger.Debug.Sync('hello');
-    await _logger.Info.Sync('hello');
-    await _logger.Warning.Sync('hello');
-    await _logger.Error.Sync('hello');
+    await _logger.Init.Sync('Init');
+    await _logger.Debug.Sync('Debug');
+    await _logger.Info.Sync('Info');
+    await _logger.Warning.Sync('Warning');
+    await _logger.Error.Sync('Error');
     process.exit(0);
 })();

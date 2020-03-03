@@ -6,6 +6,7 @@ var _cfg = readJson(CFG_FILE);
 var _mysql = require('mysql');
 var _pool = _mysql.createPool(_cfg.sql.connection);
 
+// catch uncaught exceptions
 process.on('uncaughtException', (exception) => {
     console.log(exception);
     executeLog('Uncaught exception', exception.stack || exception, _cfg.log_types.critical)
@@ -17,6 +18,7 @@ process.on('uncaughtException', (exception) => {
         });
 });
 
+// catch unhandled rejections
 process.on('unhandledRejection', (rejection) => {
     console.log(rejection);
     executeLog('Unhandled promise rejection', rejection.stack || rejection, _cfg.log_types.critical)
@@ -28,9 +30,33 @@ process.on('unhandledRejection', (rejection) => {
         });
 });
 
+// Log that the app has started
+executeLog(_cfg.messages.init, '', _cfg.log_types.init);
+
 module.exports = {
-    Init: function(cb) {
-        return executeLog(_cfg.messages.init, '', _cfg.log_types.info);
+    Init: {
+        Async: function(message, details) {
+            this.Sync(message, details)
+                .then(() => {
+                })
+                .catch(() => {
+                });
+        },
+        Sync: async function(message, details) {
+            return new Promise((resolve, reject) => {
+                executeLog(message, details, _cfg.log_types.init)
+                    .then((msg) => {
+                        if (_cfg.debug_mode)
+                            console.log(msg);
+                        resolve(msg);
+                    })
+                    .catch((err) => {
+                        if (_cfg.debug_mode)
+                            console.log(err);
+                        reject(msg);
+                    });
+            });
+        }
     },
     Debug: {
         Async: function(message, details) {
