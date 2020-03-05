@@ -158,6 +158,9 @@ module.exports = {
 
 async function executeLog(message = _cfg.messages.default, details = '', logTypeID = _cfg.log_types.debug) {
     return new Promise((resolve, reject) => {
+        if (details)
+            details = JSON.stringify(details);
+
         (async () => {
             _pool.getConnection((err, connection) => {
                 if (err)
