@@ -7,12 +7,27 @@
     - Run `npm install` to install required packages.
     - Run/edit `test.js` to make sure that all connections are good to go.
 ## Usage
-- Import at the very top of the file, before anything else:
+- Import after all other submodules but before any program code:
     ```javascript
       var _path = require('path');
+
+      // import other submodules first
+
       var _logger = require(_path.resolve(__dirname, 'Node-Logger', 'app.js'));
 
-      // rest of program code here
+      // rest of program code goes here
     ```
 - `_logger.MethodName.Async(...);` to log fire-and-forget events.
 - `[await] _logger.MethodName.Sync(...).then(...).catch(...);` to log events that must be synchronous.
+- It can also be wrapped in an anonymous `async` function for certain uses (like inside of another callback, shown here)
+  ``` javascript
+  function myFunction(callback(value) => {
+    // some callback code
+
+    (async () => {
+      // [await] _logger.Methodname.Sync(...).then(...).catch(...);
+
+      // more code to be called once logging is done
+    })();
+  });
+  ```
