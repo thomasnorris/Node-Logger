@@ -25,7 +25,7 @@
     // some callback code
 
     (async () => {
-      // [await] _logger.Methodname.Sync(...).then(...).catch(...);
+      // [await] _logger.MethodName.Sync(...).then(...).catch(...);
 
       // more code to be called once logging is done
     })();
