@@ -42,6 +42,7 @@ types.forEach((type, i) => {
     let name = type.slice(0, 1).toUpperCase() + type.slice(1, type.length);
 
     prop[name] = {
+        type: _cfg.log_types[type],
         Async: function(message, details) {
             this.Sync(message, details)
             .then(() => {
@@ -51,7 +52,7 @@ types.forEach((type, i) => {
         },
         Sync: function(message, details) {
             return new Promise((resolve, reject) => {
-                executeLog(message, details, types[type])
+                executeLog(message, details, this.type)
                     .then((msg) => {
                         if (_cfg.debug_mode)
                             console.log(msg);
